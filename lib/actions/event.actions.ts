@@ -1,10 +1,10 @@
 'use server'
 
-import { CreateEventParams } from "@/types"
-import { handleError } from '@/lib/utils'
-import { connectToDatabase } from '@/lib/database'
-import User from "../database/models/user.model"
-import Event from "../database/models/event.model"
+import { CreateEventParams } from '@/types'
+import { handleError } from '../utils'
+import Event from '../database/models/event.model'
+import User from '../database/models/user.model'
+import { connectToDatabase } from '../database'
 
 export async function createEvents({event, userId, path}: CreateEventParams){
 
