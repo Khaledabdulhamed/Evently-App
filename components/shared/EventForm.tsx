@@ -15,6 +15,10 @@ import Image from 'next/image'
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Checkbox } from "@/components/ui/checkbox"
+import { useUploadThing } from '@/lib/uploadthing'
+import { useRouter } from 'next/navigation'
+import { createEvents } from '@/lib/actions/event.actions'
+
 
 
 type EventFormProps =  {
@@ -25,22 +29,47 @@ type EventFormProps =  {
 const EventForm = ({userId, type}:EventFormProps ) => {
 const [files, setFiles] = useState<File[]>([])
     const initialValues = eventDefaultValues;
+    const router = useRouter()
 
-
+  const {startUpload} = useUploadThing('imageUploader')
 
     const form = useForm<z.infer<typeof eventFormSchema>>({
         resolver: zodResolver(eventFormSchema),
-        defaultValues: {
-          username: initialValues,
-        },
+          defaultValues: initialValues,
       })
      
       // 2. Define a submit handler.
-      function onSubmit(values: z.infer<typeof eventFormSchema>) {
-        // Do something with the form values.
-        // ✅ This will be type-safe and validated.
-        console.log(values)
+      async function onSubmit(values: z.infer<typeof eventFormSchema>) {
+        let uploadedImageUrl = values.imageUrl
+
+        if(files.length > 0 ) {
+          const uploadedImages = await startUpload(files)
+
+          if(!uploadedImages){
+            return
+          }
+          uploadedImageUrl = uploadedImages[0].url
+        }
+
+        if(type ==='Create')
+        try {
+      const newEvent = await createEvents({
+        event: {...values, imageUrl: uploadedImageUrl},
+        userId,
+        path: '/profile'
+      })
+
+      if(newEvent){
+        form.reset();
+        router.push(`/events/${newEvent._id}`)
       }
+
+        } catch (error){
+        console.log(error);
+      }
+    }
+
+    
     return (
         <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
@@ -74,7 +103,7 @@ const [files, setFiles] = useState<File[]>([])
           <div className='flex flex-col gap-5 md:flex-row'>
           <FormField
             control={form.control}
-            name="Description"
+            name="description"
             render={({ field }) => (
               <FormItem className='w-full'>
                 <FormControl className='h-72'>
