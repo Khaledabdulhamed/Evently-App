@@ -54,8 +54,8 @@ export default async function Home({searchParams}: SearchParamProps) {
           emptyStateSubtext="Come back Later"
           collectionType="All_Events"
           limit={6}
-          page={1}
-          totalPages={2} urlParamName={''}    />
+          page={page}
+          totalPages={events?.totalPages} urlParamName={''}    />
 
     </section>
     

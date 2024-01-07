@@ -28,29 +28,28 @@ const CategoryFilter = () => {
     getCategories();
   },[])
 
-    useEffect(()=> {
-      const delayDeboundeFn = setTimeout(()=> {
+    
+    //   })
+    //   return () => clearTimeout(delayDeboundeFn)
+    // }, [categories, searchParams, router])
+   
+    const onSelectCategory = (category: string) => {
+
           let newUrl =''
-          if(categories) {
+          if(category && category !== 'All' ) {
                newUrl = formUrlQuery({
                   params: searchParams.toString(),
-                  key: 'query',
-                  value: categories
+                  key: 'category',
+                  value: category
               })
           } else {
                newUrl = removeKeysFromQuery({
                   params: searchParams.toString(),
-                  keysToRemove: ['query'],
+                  keysToRemove: ['category'],
               })
           }
   
           router.push(newUrl, {scroll: false})
-      })
-      return () => clearTimeout(delayDeboundeFn)
-    }, [categories, searchParams, router])
-   
-    const onSelectCategory = (category: string) => {
-
     }
 
   return (
@@ -60,6 +59,11 @@ const CategoryFilter = () => {
         </SelectTrigger>
          <SelectContent>
         <SelectItem value="All" className='select-item p-regular-14 '>All</SelectItem>
+          {categories.map((category)=>(
+            <SelectItem className='select-item p-regular-14' value={category.name} key={category._id}>
+              {category.name}
+            </SelectItem>
+          ))}
           </SelectContent>
          </Select>
 
